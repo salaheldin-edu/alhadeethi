@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <title>بحث بالأسماء من Google Sheets (CSV أونلاين)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body { font-family: Tahoma, "Segoe UI", Arial, sans-serif; margin:0; padding:20px; }
+    .bar { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+    input[type="text"]{ padding:10px 12px; width:320px; font-size:16px; }
+    button{ padding:10px 14px; font-size:16px; cursor:pointer; }
+    table{ width:100%; border-collapse:collapse; margin-top:12px; }
+    th,td{ border:1px solid #ccc; padding:8px; }
+    th{ background:#f3f4f6; }
+    .muted{ color:#666; font-size:0.9rem; margin:8px 0; }
+  </style>
+</head>
+<body>
+  <h2>بحث بالأسماء (يعرض فقط المطابقين)</h2>
+  <div class="bar">
+    <input id="q" type="text" placeholder="اكتب الاسم (مثال: علي محمد)" />
+    <button id="btnSearch" type="button">بحث</button>
+    <button id="btnClear" type="button">مسح</button>
+  </div>
+  <p class="muted">ملاحظة: إذا كان البحث فارغ، لن يعرض أي صفوف.</p>
+
+  <div id="status" class="muted"></div>
+  <table>
+    <thead id="thead"></thead>
+    <tbody id="tbody"></tbody>
+  </table>
+
+<script>
+  // 1) ضع رابط CSV المنشور للويب هنا (انتبه: & وليس &amp;)
+  const CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQjbBW7xZiKuZjBiqDKGSbcw8fqfmtjVYJ2G5tkX4F_SWUlMukrTRKxEGToRpNgZw/pub?gid=1719705121&single=true&output=csv';
+
+  // عمود الاسم اسمُه شنو؟ (غيّره إذا مو 'name' أو 'الاسم')
+  const POSSIBLE_NAME_HEADERS = ['name','Name','الاسم'];
+
+  const thead = document.getElementById('thead');
+  const tbody = document.getElementById('tbody');
+  const statusEl = document.getElementById('status');
+  const qEl = document.getElementById('q');
+
+  let HEADERS = [];
+  let ROWS = [];
+  let nameIdx = -1;
+
+  function normalize(ar){
+    return (ar||'').toLowerCase()
+      .normalize('NFKD')
+      .replace(/[\u064B-\u0652]/g,'') // إزالة التشكيل
+      .replace(/ـ/g,'')               // إزالة التطويل
+      .replace(/[آأإ]/g,'ا')          // توحيد الألف
+      .replace(/ى/g,'ي')              // توحيد الياء/الألف المقصورة
+      .trim();
+  }
+  function parseCSV(text){
+    const rows=[]; let row=[]; let field=''; let inQ=false;
+    for(let i=0;i<text.length;i++){
+      const c=text[i];
+      if(inQ){
+        if(c==='"'){ if(text[i+1]==='"'){ field+='"'; i++; } else { inQ=false; } }
+        else field+=c;
+      } else {
+        if(c==='"') inQ=true;
+        else if(c===','){ row.push(field); field=''; }
+        else if(c==='\n'){ row.push(field); rows.push(row); row=[]; field=''; }
+        else if(c==='\r'){}
+        else field+=c;
+      }
+    }
+    row.push(field);
+    if(!(row.length===1 && row[0]==='')) rows.push(row);
+    return rows;
+  }
+  function detectNameIndex(headers){
+    for(let i=0;i<headers.length;i++){
+      if(POSSIBLE_NAME_HEADERS.includes((headers[i]||'').trim())) return i;
+    }
+    return -1;
+  }
+  function renderHeader(){
+    thead.innerHTML = '';
+    const tr = document.createElement('tr');
+    for(const h of HEADERS){
+      const th = document.createElement('th'); th.textContent = h||'(بدون عنوان)';
+      tr.appendChild(th);
+    }
+    thead.appendChild(tr);
+  }
+  function renderBody(rows){
+    tbody.innerHTML = '';
+    for(const r of rows){
+      const tr = document.createElement('tr');
+      for(let i=0;i<HEADERS.length;i++){
+        const td=document.createElement('td');
+        td.textContent = (r[i]??'');
+        tr.appendChild(td);
+      }
+      tbody.appendChild(tr);
+    }
+    statusEl.textContent = `عدد النتائج: ${rows.length}`;
+  }
+
+  async function loadCSV(){
+    statusEl.textContent = 'جاري التحميل…';
+    const res = await fetch(CSV_URL, { cache:'no-store', redirect:'follow' });
+    if(!res.ok) throw new Error('تعذر تحميل CSV. تأكد من الرابط/النشر.');
+    const text = await res.text();
+    const rows = parseCSV(text);
+    if(!rows.length) throw new Error('CSV فارغ.');
+    HEADERS = rows[0].map(c => (c??'').toString().trim());
+    ROWS = rows.slice(1);
+
+    nameIdx = detectNameIndex(HEADERS);
+    if(nameIdx === -1){
+      // إذا ما موجود عمود "name" أو "الاسم" نعتبر أول عمود هو الاسم
+      nameIdx = 0;
+      statusEl.textContent = 'ملاحظة: لم أعثر على عمود name/الاسم — تم اعتبار العمود الأول كعمود اسم.';
+    } else {
+      statusEl.textContent = `تم التحميل. الأعمدة: ${HEADERS.join(' | ')}`;
+    }
+    renderHeader();
+    // لا نعرض أي شيء بالبداية إلى أن يكتب المستخدم
+    renderBody([]);
+  }
+
+  function applySearch(){
+    const raw = qEl.value || '';
+    const tokens = normalize(raw).split(/\s+/).filter(Boolean);
+    if(tokens.length === 0){
+      // إذا البحث فارغ: لا تعرض شيء
+      renderBody([]);
+      return;
+    }
+    const filtered = ROWS.filter(r => {
+      const name = normalize(r[nameIdx] || '');
+      return tokens.every(t => name.includes(t));
+    });
+    renderBody(filtered);
+  }
+  function clearSearch(){
+    qEl.value = '';
+    renderBody([]);
+    qEl.focus();
+  }
+
+  let t;
+  qEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter'){ e.preventDefault(); applySearch(); } });
+  qEl.addEventListener('input', ()=>{ clearTimeout(t); t = setTimeout(applySearch, 250); });
+  document.getElementById('btnSearch').addEventListener('click', applySearch);
+  document.getElementById('btnClear').addEventListener('click', clearSearch);
+
+  loadCSV().catch(err => { statusEl.textContent = 'خطأ: ' + err.message; });
+</script>
+</body>
+</html>
