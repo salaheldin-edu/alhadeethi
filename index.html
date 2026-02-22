@@ -2,7 +2,7 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>دومينو الحديثي - النسخة الملكية</title>
+    <title>دومينو الحديثي - النسخة الأخلاقية</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Dubai:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -14,7 +14,7 @@
             --danger: #ff453a;
             --success: #32d74b;
             --gold: #ffd700;
-            --silver: #ebebeb;
+            --warning: #ff9f0a;
         }
 
         body { 
@@ -39,7 +39,18 @@
             margin-bottom: 20px;
         }
 
-        /* إجبار الأرقام الإنكليزية */
+        .important-note {
+            background: rgba(255, 159, 10, 0.1);
+            border: 1px solid var(--warning);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 0.9em;
+            line-height: 1.6;
+            color: var(--warning);
+            text-align: justify;
+        }
+
         input {
             width: 100%; padding: 15px; margin: 10px 0;
             border-radius: 15px; border: 1px solid var(--glass-border);
@@ -67,7 +78,6 @@
         .leader { border-color: var(--danger); background: rgba(255, 69, 58, 0.15); }
         .leader .num { color: var(--danger); font-size: 2.2em; font-weight: 900; }
 
-        /* ستايل التقرير */
         .award-card {
             text-align: center; padding: 15px; border-radius: 20px; margin: 10px 0;
             border: 1px solid var(--glass-border);
@@ -77,7 +87,7 @@
 
         .round-record {
             border-right: 4px solid var(--primary);
-            padding: 10px 15px; margin-bottom: 15px;
+            padding: 10px 15px; margin-bottom: 20px;
             background: rgba(255,255,255,0.02); border-radius: 15px 0 0 15px;
         }
 
@@ -91,7 +101,12 @@
 <div class="app-container">
     <div id="scr_welcome" class="glass-card">
         <h2 style="text-align:center">🀄 دومينو الحديثي</h2>
-        <p style="text-align:center; opacity:0.6;">إصدار النجوم والألقاب الملكية</p>
+        
+        <div class="important-note">
+            <b>⚠️ ملاحظة هامة:</b><br>
+            ان لعبة الدومينو هي للتسلية وليست للعصبية والسب والشتم انتقوا الفاظكم والعبوا بروح رياضية اذا خسرت مراح تنتهي الدنيا واذا فزت لا تفرح حيل باجر تخسر واذا عندك شغل عوف الدومنا وكوم كمل شغلك احسن واذا فاضي حضر النركيلة يمك وجيب الواعيب الي يعرفون والي ما يعرف خل يكعد يتفرج والاعب الي تخسر ويا لا تلعب ويا بعد لان اثول ما يفيد وبس يرفع السكر ولا تلعب ضد فريق ميعرفون يلعبون لان راح يخخدعوك بغشامتهم.
+        </div>
+
         <button class="btn-primary" onclick="navTo('scr_setup')">بدء جلسة جديدة</button>
     </div>
 
@@ -172,10 +187,10 @@
         round: 1,
         teams: { t1: { n: "", p: [], w: 0 }, t2: { n: "", p: [], w: 0 } },
         history: [],
-        playerTotals: {} // لتخزين مجموع كل لاعب للجلسة كاملة
+        playerTotals: {} 
     };
 
-    let round = { t1S: 0, t2S: 0, logs: [] };
+    let roundData = { t1S: 0, t2S: 0, logs: [] };
 
     const winTitles = ["زوري الطاولة", "المهندس الملكي", "كاسر الخشوم", "المنقذ", "الحريف", "أسد الدومينو"];
     const loseTitles = ["أبو بلاش", "موزع هدايا", "خوش ولد", "عشاي العصافير", "الغشيم", "صانع الفرحة لغيره"];
@@ -191,7 +206,6 @@
         session.teams.t2.n = document.getElementById('t2_name').value || "الفريق 2";
         session.teams.t2.p = [document.getElementById('t2_p1').value || "لاعب 3", document.getElementById('t2_p2').value || "لاعب 4"];
         
-        // تصفير عداد النقاط التراكمي للاعبين
         [...session.teams.t1.p, ...session.teams.t2.p].forEach(name => session.playerTotals[name] = 0);
         
         updateGameUI();
@@ -211,14 +225,14 @@
         ins.forEach((v, i) => {
             if(v > 0) {
                 let pName = i < 2 ? session.teams.t1.p[i] : session.teams.t2.p[i-2];
-                round.logs.push({ name: pName, val: v, time: time });
+                roundData.logs.push({ name: pName, val: v, time: time });
                 session.playerTotals[pName] += v;
-                if(i < 2) round.t1S += v; else round.t2S += v;
+                if(i < 2) roundData.t1S += v; else roundData.t2S += v;
             }
         });
 
         updateGameUI();
-        if(round.t1S >= 151 || round.t2S >= 151) finishRound();
+        if(roundData.t1S >= 151 || roundData.t2S >= 151) finishRound();
     }
 
     function updateGameUI() {
@@ -228,30 +242,30 @@
         document.getElementById('label_p2').innerText = session.teams.t1.p[1];
         document.getElementById('p1_total').innerText = session.playerTotals[session.teams.t1.p[0]];
         document.getElementById('p2_total').innerText = session.playerTotals[session.teams.t1.p[1]];
-        document.getElementById('total_t1').innerText = round.t1S;
+        document.getElementById('total_t1').innerText = roundData.t1S;
 
         document.getElementById('head_t2').innerText = session.teams.t2.n;
         document.getElementById('label_p3').innerText = session.teams.t2.p[0];
         document.getElementById('label_p4').innerText = session.teams.t2.p[1];
         document.getElementById('p3_total').innerText = session.playerTotals[session.teams.t2.p[0]];
         document.getElementById('p4_total').innerText = session.playerTotals[session.teams.t2.p[1]];
-        document.getElementById('total_t2').innerText = round.t2S;
+        document.getElementById('total_t2').innerText = roundData.t2S;
 
         const c1 = document.getElementById('card_t1'); const c2 = document.getElementById('card_t2');
         c1.classList.remove('leader'); c2.classList.remove('leader');
-        if(round.t1S > round.t2S) c1.classList.add('leader'); else if(round.t2S > round.t1S) c2.classList.add('leader');
+        if(roundData.t1S > roundData.t2S) c1.classList.add('leader'); else if(roundData.t2S > roundData.t1S) c2.classList.add('leader');
 
         for(let i=1; i<=4; i++) document.getElementById('in_p'+i).value = "";
     }
 
     function finishRound() {
-        let winner = round.t1S >= 151 ? session.teams.t1.n : session.teams.t2.n;
-        if(round.t1S >= 151) session.teams.t1.w++; else session.teams.t2.w++;
+        let winner = roundData.t1S >= 151 ? session.teams.t1.n : session.teams.t2.n;
+        if(roundData.t1S >= 151) session.teams.t1.w++; else session.teams.t2.w++;
 
         session.history.push({
             num: session.round,
-            t1F: round.t1S, t2F: round.t2S,
-            win: winner, logs: [...round.logs]
+            t1F: roundData.t1S, t2F: roundData.t2S,
+            win: winner, logs: [...roundData.logs]
         });
 
         showReport();
@@ -260,7 +274,6 @@
     function showReport() {
         document.getElementById('session_meta').innerText = "تاريخ الجلسة: " + new Date().toLocaleString("ar-EG");
         
-        // تحديد النجم والأفشل
         let players = Object.keys(session.playerTotals);
         let mvp = players.reduce((a, b) => session.playerTotals[a] > session.playerTotals[b] ? a : b);
         let noob = players.reduce((a, b) => session.playerTotals[a] < session.playerTotals[b] ? a : b);
@@ -287,7 +300,8 @@
         `;
 
         let hHtml = "";
-        session.history.slice().reverse().forEach(r => {
+        // تم تعديل الترتيب ليظهر الشوط الأول في البداية (من 1 إلى الأخير)
+        session.history.forEach(r => {
             hHtml += `
                 <div class="round-record">
                     <div style="display:flex; justify-content:space-between;"><b>الشوط ${r.num}</b> <span style="color:var(--success)">الفائز: ${r.win}</span></div>
@@ -305,7 +319,7 @@
 
     function startNextRound() {
         session.round++;
-        round = { t1S: 0, t2S: 0, logs: [] };
+        roundData = { t1S: 0, t2S: 0, logs: [] };
         updateGameUI();
         navTo('scr_game');
     }
@@ -314,7 +328,7 @@
         const area = document.getElementById('capture_area');
         html2canvas(area, { scale: 3, backgroundColor: '#000000' }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Dominos_Session_${Date.now()}.png`;
+            link.download = `تقرير_دومينو_${Date.now()}.png`;
             link.href = canvas.toDataURL("image/png");
             link.click();
         });
