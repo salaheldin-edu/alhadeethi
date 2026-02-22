@@ -2,14 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>دومينو الحديثي - نسخة الكاميرا والأبطال</title>
+    <title>دومينو الحديثي - نسخة الملص والأبطال</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link href="https://fonts.googleapis.com/css2?family=Dubai:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         :root {
-            --glass: rgba(255, 255, 255, 0.07);
-            --glass-border: rgba(255, 255, 255, 0.12);
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(255, 255, 255, 0.15);
             --primary: #0a84ff;
             --danger: #ff453a;
             --success: #32d74b;
@@ -26,7 +26,7 @@
         .app-container { width: 100%; max-width: 480px; }
 
         .glass-card {
-            background: var(--glass); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            background: var(--glass); backdrop-filter: blur(25px); -webkit-backdrop-filter: blur(25px);
             border-radius: 25px; padding: 20px; border: 1px solid var(--glass-border); margin-bottom: 20px;
         }
 
@@ -38,18 +38,18 @@
 
         /* تنسيق صور اللاعبين */
         .player-avatar {
-            width: 50px; height: 50px; border-radius: 50%; border: 2px solid #fff;
+            width: 60px; height: 60px; border-radius: 50%; border: 2px solid #fff;
             object-fit: cover; background: #333; margin-left: 10px;
         }
-        .avatar-large { width: 80px; height: 80px; border-width: 3px; margin-bottom: 10px; }
+        .avatar-large { width: 90px; height: 90px; border-width: 3px; }
 
         .cam-btn {
-            background: #444; color: white; border-radius: 50%; width: 40px; height: 40px;
+            background: #444; color: white; border-radius: 50%; width: 45px; height: 45px;
             display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.2em;
         }
 
         input {
-            width: 100%; padding: 12px; margin: 5px 0; border-radius: 12px;
+            width: 100%; padding: 14px; margin: 5px 0; border-radius: 12px;
             border: 1px solid var(--glass-border); font-size: 18px; box-sizing: border-box;
             background: rgba(0, 0, 0, 0.6); color: #fff; text-align: center; direction: ltr;
         }
@@ -63,12 +63,14 @@
         .btn-success { background: var(--success); color: white; }
         .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: white; }
 
+        /* الأرقام الكبيرة */
+        .num-large { font-size: 2.8em !important; font-weight: 900; line-height: 1; margin: 5px 0; display: block; }
         .total-display {
-            text-align: center; padding: 10px; border-radius: 15px;
+            text-align: center; padding: 15px; border-radius: 20px;
             background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);
         }
-        .leader { border-color: var(--danger); background: rgba(255, 69, 58, 0.15); }
-        .leader .num { color: var(--danger); font-size: 2em; font-weight: 900; }
+        .leader { border-color: var(--danger); background: rgba(255, 69, 58, 0.2); }
+        .leader .num-large { color: var(--danger); text-shadow: 0 0 15px rgba(255,69,58,0.5); }
 
         /* كاميرا المودال */
         #camera_modal {
@@ -76,14 +78,16 @@
             z-index: 999; display: none; flex-direction: column; align-items: center; justify-content: center;
         }
         video { width: 90%; border-radius: 20px; border: 2px solid var(--primary); }
+        .mirrored { transform: scaleX(-1); }
+
+        .mals-badge {
+            background: var(--danger); color: white; padding: 5px 15px; border-radius: 10px;
+            font-weight: bold; animation: pulse 1s infinite;
+        }
+        @keyframes pulse { 0% {transform: scale(1);} 50% {transform: scale(1.1);} 100% {transform: scale(1);} }
 
         .award-card { text-align: center; padding: 15px; border-radius: 20px; margin: 10px 0; border: 1px solid var(--glass-border); }
-        .mvp { background: rgba(255, 215, 0, 0.1); border-color: var(--gold); }
-        .noob { background: rgba(255, 69, 58, 0.1); border-color: var(--danger); }
-
-        .round-record { border-right: 4px solid var(--primary); padding: 10px; margin-bottom: 15px; background: rgba(255,255,255,0.02); border-radius: 15px 0 0 15px; }
-        .history-table { width: 100%; border-collapse: collapse; font-size: 0.8em; margin-top: 5px; }
-        .history-table td { padding: 5px; border-bottom: 1px solid rgba(255,255,255,0.05); }
+        .mvp { background: rgba(255, 215, 0, 0.15); border-color: var(--gold); }
     </style>
 </head>
 <body>
@@ -93,27 +97,40 @@
         <h2 style="text-align:center">🀄 دومينو الحديثي</h2>
         <div class="important-note">
             <b>⚠️ ملاحظة هامة:</b><br>
-            ان لعبة الدومينو هي للتسلية وليست للعصبية والسب والشتم انتقوا الفاظكم والعبوا بروح رياضية اذا خسرت مراح تنتهي الدنيا واذا فزت لا تفرح حيل باجر تخسر واذا عندك شغل عوف الدومنا وكوم كمل شغلك احسن واذا فاضي حضر النركيلة يمك وجيب الواعيبة.. واللاعب اللي تخسر وياه لا تلعب وياه بعد لأن اثول ما يفيد وبس يرفع السكر!
+            ان لعبة الدومينو هي للتسلية وليست للعصبية والسب والشتم انتقوا الفاظكم والعبوا بروح رياضية.. إذا خسرت مراح تنتهي الدنيا، وإذا فاضي حضر النركيلة يمك وجيب الواعيبة.. واللاعب اللي تخسر وياه لا تلعب وياه بعد لأن اثول ما يفيد وبس يرفع السكر!
         </div>
         <button class="btn-primary" onclick="navTo('scr_setup')">بدء جلسة جديدة</button>
     </div>
 
     <div id="scr_setup" class="glass-card" style="display:none;">
-        <h3>بيانات وصور الأبطال</h3>
-        <div id="player_inputs">
-            </div>
-        <button class="btn-primary" style="margin-top:10px" onclick="initSession()">دخول الطاولة</button>
+        <h3>إعداد الفرق والصور</h3>
+        
+        <div class="glass-card" style="background:rgba(10, 132, 255, 0.1)">
+            <input type="text" id="team1_name" placeholder="اسم الفريق الأول (مثلاً: الصقور)">
+            <div id="p_inputs_t1"></div>
+        </div>
+
+        <div class="glass-card" style="background:rgba(50, 215, 75, 0.05)">
+            <input type="text" id="team2_name" placeholder="اسم الفريق الثاني (مثلاً: الأسود)">
+            <div id="p_inputs_t2"></div>
+        </div>
+
+        <button class="btn-primary" onclick="initSession()">دخول الطاولة</button>
     </div>
 
     <div id="scr_game" class="glass-card" style="display:none;">
-        <div style="text-align:center; margin-bottom:10px;"><span id="round_tag" style="background:var(--primary); padding:3px 12px; border-radius:20px; font-size:0.8em;">شوط 1</span></div>
+        <div style="text-align:center; margin-bottom:10px;">
+            <span id="round_tag" style="background:var(--primary); padding:5px 15px; border-radius:20px; font-weight:bold;">الشوط 1</span>
+        </div>
         <div id="game_ui_content"></div>
-        <button class="btn-success" style="margin-top:20px;" onclick="addPoints()">تسجيل النقاط</button>
+        <button class="btn-success" style="margin-top:20px; font-size:1.3em;" onclick="addPoints()">تسجيل النقاط</button>
     </div>
 
     <div id="scr_report" style="display:none;">
         <div id="capture_area" style="background:#000; padding:20px;">
-            <h2 style="text-align:center; margin-bottom:5px;">🏆 سجل الأبطال</h2>
+            <h2 style="text-align:center; margin-bottom:5px;">🏆 سجل الأبطال الكامل</h2>
+            <div id="report_header_stats" class="glass-card" style="text-align:center; border:none; background:rgba(255,255,255,0.05)">
+                </div>
             <div id="awards_section"></div>
             <div id="all_rounds_history"></div>
             <p style="text-align:center; font-size:0.7em; color:var(--primary); margin-top:30px;">تصميم م. أمين الحديثي</p>
@@ -128,7 +145,14 @@
 
 <div id="camera_modal">
     <video id="video" autoplay playsinline></video>
-    <div style="margin-top:20px; display:flex; gap:20px;">
+    <div style="margin:20px 0;">
+        <label style="color:white; margin-right:10px;">اختر الكاميرا:</label>
+        <select id="cam_selector" onchange="restartCamera()" style="padding:10px; border-radius:10px; background:#333; color:white;">
+            <option value="user">الأمامية (سيلفي)</option>
+            <option value="environment">الخلفية</option>
+        </select>
+    </div>
+    <div style="display:flex; gap:20px;">
         <button class="btn-success" style="width:120px" onclick="capturePhoto()">التقاط</button>
         <button class="btn-outline" style="width:120px" onclick="closeCamera()">إلغاء</button>
     </div>
@@ -138,12 +162,7 @@
 <script>
     let session = {
         round: 1,
-        players: [
-            { id: 0, name: "", team: 1, photo: null, total: 0 },
-            { id: 1, name: "", team: 1, photo: null, total: 0 },
-            { id: 2, name: "", team: 2, photo: null, total: 0 },
-            { id: 3, name: "", team: 2, photo: null, total: 0 }
-        ],
+        players: [],
         teams: [{n:"", w:0}, {n:"", w:0}],
         history: []
     };
@@ -151,18 +170,21 @@
     let roundData = { t1S: 0, t2S: 0, logs: [] };
     let activeCamPlayer = null;
 
-    // توليد مدخلات الإعداد
-    const setupDiv = document.getElementById('player_inputs');
-    for(let i=0; i<4; i++) {
-        setupDiv.innerHTML += `
-            <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
-                <div class="cam-btn" onclick="openCamera(${i})">📷</div>
-                <img id="preview_${i}" class="player-avatar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
-                <input type="text" id="p_name_${i}" placeholder="اسم اللاعب ${i+1}">
-            </div>
-            ${i === 1 ? '<hr style="opacity:0.1">' : ''}
-        `;
+    // توليد مدخلات اللاعبين
+    function renderSetup() {
+        for(let i=0; i<4; i++) {
+            let target = i < 2 ? 'p_inputs_t1' : 'p_inputs_t2';
+            document.getElementById(target).innerHTML += `
+                <div style="display:flex; align-items:center; gap:10px; margin-top:10px;">
+                    <div class="cam-btn" onclick="openCamera(${i})">📷</div>
+                    <img id="preview_${i}" class="player-avatar" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=">
+                    <input type="text" id="p_name_${i}" placeholder="اسم اللاعب ${i+1}">
+                </div>
+            `;
+            session.players.push({ id: i, name: "", team: (i < 2 ? 1 : 2), photo: null, total: 0 });
+        }
     }
+    renderSetup();
 
     function navTo(id) {
         document.querySelectorAll('.app-container > div').forEach(d => d.style.display = 'none');
@@ -172,11 +194,21 @@
     // إدارة الكاميرا
     async function openCamera(idx) {
         activeCamPlayer = idx;
-        const modal = document.getElementById('camera_modal');
+        document.getElementById('camera_modal').style.display = 'flex';
+        restartCamera();
+    }
+
+    async function restartCamera() {
         const video = document.getElementById('video');
-        modal.style.display = 'flex';
+        const mode = document.getElementById('cam_selector').value;
+        if(video.srcObject) video.srcObject.getTracks().forEach(t => t.stop());
+        
+        // عكس الصورة في الكاميرا الأمامية
+        if(mode === 'user') video.classList.add('mirrored');
+        else video.classList.remove('mirrored');
+
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false });
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: mode } });
             video.srcObject = stream;
         } catch (e) { alert("تعذر فتح الكاميرا"); closeCamera(); }
     }
@@ -190,15 +222,22 @@
     function capturePhoto() {
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
-        const context = canvas.getContext('2d');
-        canvas.width = 300; canvas.height = 300;
+        const mode = document.getElementById('cam_selector').value;
+        const ctx = canvas.getContext('2d');
+        canvas.width = 400; canvas.height = 400;
         
-        // قص الصورة لتكون مربعة من المركز
         let minSide = Math.min(video.videoWidth, video.videoHeight);
         let sx = (video.videoWidth - minSide) / 2;
         let sy = (video.videoHeight - minSide) / 2;
         
-        context.drawImage(video, sx, sy, minSide, minSide, 0, 0, 300, 300);
+        ctx.save();
+        if(mode === 'user') { // عكس الصورة إذا كانت سيلفي
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+        }
+        ctx.drawImage(video, sx, sy, minSide, minSide, 0, 0, 400, 400);
+        ctx.restore();
+
         const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
         session.players[activeCamPlayer].photo = dataUrl;
         document.getElementById(`preview_${activeCamPlayer}`).src = dataUrl;
@@ -206,32 +245,37 @@
     }
 
     function initSession() {
+        session.teams[0].n = document.getElementById('team1_name').value || "الفريق الأول";
+        session.teams[1].n = document.getElementById('team2_name').value || "الفريق الثاني";
         session.players.forEach((p, i) => p.name = document.getElementById(`p_name_${i}`).value || `لاعب ${i+1}`);
         updateGameUI();
         navTo('scr_game');
     }
 
     function updateGameUI() {
-        document.getElementById('round_tag').innerText = "شوط " + session.round;
+        document.getElementById('round_tag').innerText = "الشوط " + session.round;
         let html = "";
-        [1, 2].forEach(teamNum => {
+        [1, 2].forEach((teamNum, idx) => {
             let teamPlayers = session.players.filter(p => p.team === teamNum);
             let teamScore = teamNum === 1 ? roundData.t1S : roundData.t2S;
             html += `
-                <div class="${teamNum === 1 ? '' : 'team2-area'}">
-                    <h4 style="color:var(--primary); margin:10px 0;">الفريق ${teamNum}</h4>
+                <div class="team-block">
+                    <h2 style="color:var(--primary); text-align:center; margin-bottom:5px;">${session.teams[idx].n}</h2>
                     ${teamPlayers.map(p => `
-                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:10px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
                             <div style="display:flex; align-items:center;">
                                 <img src="${p.photo || ''}" class="player-avatar" style="display:${p.photo ? 'block':'none'}">
-                                <div><b>${p.name}</b><br><small style="color:var(--success)">${p.total} نقطة</small></div>
+                                <div><b style="font-size:1.1em">${p.name}</b><br><small style="color:var(--success)">تراكمي: ${p.total}</small></div>
                             </div>
-                            <input type="number" inputmode="numeric" id="in_p_${p.id}" style="width:70px; margin:0; padding:8px;">
+                            <input type="number" inputmode="numeric" id="in_p_${p.id}" style="width:80px; height:50px; font-size:22px;">
                         </div>
                     `).join('')}
-                    <div id="card_t${teamNum}" class="total-display">مجموع الفريق: <span class="num">${teamScore}</span></div>
+                    <div id="card_t${teamNum}" class="total-display">
+                        <small>مجموع الفريق</small>
+                        <span class="num-large">${teamScore}</span>
+                    </div>
                 </div>
-                ${teamNum === 1 ? '<hr style="opacity:0.1; margin:20px 0;">' : ''}
+                ${teamNum === 1 ? '<div style="margin:25px 0; border-top:1px dashed #444;"></div>' : ''}
             `;
         });
         document.getElementById('game_ui_content').innerHTML = html;
@@ -247,12 +291,14 @@
 
     function addPoints() {
         session.players.forEach(p => {
-            let val = Number(document.getElementById(`in_p_${p.id}`).value) || 0;
+            let el = document.getElementById(`in_p_${p.id}`);
+            let val = Number(el.value) || 0;
             if(val > 0) {
-                let time = new Date().toLocaleTimeString("en-US", {hour12:false, minute:'2-digit', second:'2-digit'});
+                let time = new Date().toLocaleTimeString("en-GB", {hour:'2-digit', minute:'2-digit', second:'2-digit'});
                 roundData.logs.push({ name: p.name, val: val, time: time, photo: p.photo });
                 p.total += val;
                 if(p.team === 1) roundData.t1S += val; else roundData.t2S += val;
+                el.value = "";
             }
         });
         updateGameUI();
@@ -260,38 +306,53 @@
     }
 
     function finishRound() {
-        let winTeam = roundData.t1S >= 151 ? 1 : 2;
+        let isMals = (roundData.t1S === 0 || roundData.t2S === 0);
+        let winTeamIdx = roundData.t1S >= 151 ? 0 : 1;
+        let pointsToAdd = isMals ? 2 : 1;
+        session.teams[winTeamIdx].w += pointsToAdd;
+
         session.history.push({
-            num: session.round, t1F: roundData.t1S, t2F: roundData.t2S,
-            winTeam: winTeam, logs: [...roundData.logs]
+            num: session.round, 
+            t1F: roundData.t1S, t2F: roundData.t2S,
+            winTeamName: session.teams[winTeamIdx].n,
+            isMals: isMals,
+            logs: [...roundData.logs]
         });
         showReport();
     }
 
     function showReport() {
-        let mvp = session.players.reduce((a, b) => a.total > b.total ? a : b);
-        let noob = session.players.reduce((a, b) => a.total < b.total ? a : b);
+        // ملخص الجلسة العلوي
+        document.getElementById('report_header_stats').innerHTML = `
+            <div style="font-size:1.1em; margin-bottom:10px;">إجمالي الأشواط: <b>${session.history.length}</b></div>
+            <div style="display:flex; justify-content:space-around; align-items:center;">
+                <div><small>${session.teams[0].n}</small><br><span style="font-size:1.8em; color:var(--primary); font-weight:bold;">${session.teams[0].w}</span></div>
+                <div style="font-size:1.5em; opacity:0.3">VS</div>
+                <div><small>${session.teams[1].n}</small><br><span style="font-size:1.8em; color:var(--primary); font-weight:bold;">${session.teams[1].w}</span></div>
+            </div>
+        `;
 
+        let mvp = session.players.reduce((a, b) => a.total > b.total ? a : b);
         document.getElementById('awards_section').innerHTML = `
             <div class="award-card mvp">
                 <img src="${mvp.photo}" class="player-avatar avatar-large">
-                <div style="font-size:1.2em; color:var(--gold)">🌟 نجم الجلسة: ${mvp.name}</div>
-                <small>مجموع نقاطه: ${mvp.total}</small>
-            </div>
-            <div class="award-card noob">
-                <img src="${noob.photo}" class="player-avatar avatar-large">
-                <div style="font-size:1.1em; color:var(--danger)">📉 أفشل لاعب: ${noob.name}</div>
-                <small>موزع هدايا رسمي</small>
+                <div style="font-size:1.3em; color:var(--gold); margin-top:5px;">🌟 نجم الجلسة: ${mvp.name}</div>
+                <small>بمجموع ${mvp.total} نقطة</small>
             </div>
         `;
 
         let hHtml = "";
+        // الترتيب من الشوط الأول إلى الأخير
         session.history.forEach(r => {
             hHtml += `
                 <div class="round-record">
-                    <div style="display:flex; justify-content:space-between;"><b>الشوط ${r.num}</b> <span style="color:var(--success)">الفائز: الفريق ${r.winTeam}</span></div>
+                    <div style="display:flex; justify-content:space-between; align-items:center;">
+                        <b>الشوط ${r.num}</b>
+                        ${r.isMals ? '<span class="mals-badge">ملص 🚀🔥</span>' : `<span style="color:var(--success); font-weight:bold;">فاز: ${r.winTeamName}</span>`}
+                    </div>
+                    <div style="font-size:0.9em; opacity:0.8; margin:5px 0;">النتيجة: ${r.t1F} - ${r.t2F}</div>
                     <table class="history-table">
-                        ${r.logs.map(l => `<tr><td><img src="${l.photo}" class="player-avatar" style="width:25px; height:25px; margin:0"></td><td>${l.name}</td><td>+${l.val}</td><td>${l.time}</td></tr>`).join('')}
+                        ${r.logs.map(l => `<tr><td><img src="${l.photo}" class="player-avatar" style="width:25px; height:25px; margin:0"></td><td>${l.name}</td><td>+${l.val}</td><td><small>${l.time}</small></td></tr>`).join('')}
                     </table>
                 </div>
             `;
@@ -311,7 +372,7 @@
         const area = document.getElementById('capture_area');
         html2canvas(area, { scale: 3, backgroundColor: '#000' }).then(canvas => {
             const link = document.createElement('a');
-            link.download = `Dominos_Report_${Date.now()}.png`;
+            link.download = `Dominos_Tournament_${Date.now()}.png`;
             link.href = canvas.toDataURL("image/png");
             link.click();
         });
